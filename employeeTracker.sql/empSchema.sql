@@ -10,6 +10,19 @@ CREATE TABLE department (
   PRIMARY KEY(id)
 );
 
+INSERT INTO department(name);
+VALUES ("Sales");
+
+INSERT INTO department(name);
+VALUES ("Engineering");
+
+INSERT INTO department(name);
+VALUES ("Finance");
+
+INSERT INTO department(name);
+VALUES ("Legal");
+
+
 CREATE TABLE role(
     id INT AUTO_INCREMENT NOT NULL,
     title VARCHAR(30) NOT NULL,
@@ -17,6 +30,9 @@ CREATE TABLE role(
     department_id INT NOT NULL,
     PRIMARY KEY(id)
 );
+INSERT INTO role();
+VALUES ();
+
 
 CREATE TABLE employee (
     id INT AUTO_INCREMENT NOT NULL,
@@ -26,6 +42,9 @@ CREATE TABLE employee (
     manager_id INT NOT NULL,
     PRIMARY KEY(id)
 );
+INSERT INTO employees();
+VALUES ();
+
 
 -- Build a command-line application that at a minimum allows the user to:
 -- Add departments, roles, employees
