@@ -1,12 +1,11 @@
-DROP DATABASE IF EXISTS empSchema;
+DROP DATABASE IF EXISTS employees;
 
 CREATE DATABASE employees;
 
 USE employees;
 
 CREATE TABLE department( 
-    id INT
-    AUTO_INCREMENT NOT NULL,
+    id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR (30) NOT NULL,
     PRIMARY KEY (id)
 );
