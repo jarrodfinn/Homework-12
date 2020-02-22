@@ -1,14 +1,12 @@
 // Build a command-line application that at a minimum allows the user to:
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+// const confirm = require('inquirer-confirm');
 
 var connection = mysql.createConnection({
     host: "localhost",
-    // Your port; if not 3306
     port: 3306,
-    // Your username
     user: "root",
-    // Your password
     password: "rootroot",
     database: "employees"
 });
@@ -18,10 +16,15 @@ connection.connect(function (err) {
     startUp();
 });
 
-
 // Add departments, roles, employees
 // View departments, roles, employees
 // Update employee roles
+
+// Bonus points if you're able to:
+// Update employee managers
+// View employees by manager
+// Delete departments, roles, and employees
+// View the total utilized budget of a department -- ie the combined salaries of all employees in that department
 
 
 function startUp() {
@@ -32,89 +35,89 @@ function startUp() {
             message: "What would you like to do?",
             choices: [
                 "View All Employees",
-                "View All Employees By Department",
-                "View All Employees By Manager",
+                "View All Department",
+                "View All Roles",
                 "Add Employee",
-                "Remove Employee",
+                "Add Department",
+                "Add Role",
                 "Update Employee Role",
-                "Update Employee Manager",
                 "exit"
             ]
         })
         .then(function (answer) {
             switch (answer.action) {
                 case "View All Employees":
-                    employeeSearch();
+                    employeeAllSearch();
                     break;
-
-                case "View All Employees By Department":
-                    deptEmpSearch();
+                case "View All Department":
+                    deptSearch();
                     break;
-
-                case "View All Employees By Manager":
-                    managerEmpSearch();
+                case "View All Roles":
+                    roleSearch();
                     break;
-
                 case "Add Employee":
                     addEmp();
                     break;
-
-                case "Remove Employee":
-                    removeEmp();
+                case "Add Department":
+                    addDept();
                     break;
-
+                case "Add Role":
+                    addRole();
+                    break;
                 case "Update Employee Role":
                     updateEmpRole();
                     break;
-
-                case "Update Employee Manager":
-                    updateEmpManager();
-                    break;
-
                 case "exit":
                     connection.end();
                     break;
             }
         });
-}
-// Bonus points if you're able to:
-// Update employee managers
-// View employees by manager
-// Delete departments, roles, and employees
-// View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-function employeeSearch() {
-
-
-
-    var query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT('manager.first_name', ' ', 'manager.last_name') AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN manager employee.manager_id = employee.id ?";
-
-    connection.query(query, { artist: answer.artist }, function (err, res) {
+};
+function employeeAllSearch() {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (err, res) {
         if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-        }
-        runSearch();
+        console.table(res);
+        startUp();
     });
-});
+};
+function deptSearch() {
+    connection.query("SELECT * from department", function (err, res) {
+        if (err) throw err;
 
-function deptEmpSearch() {
+      console.table(res);
+      startUp();
+    })  
+};
+
+function roleSearch() {
+    connection.query("SELECT * from role", function (err, res) {
+        if (err) throw err;
+
+      console.table(res);
+      startUp();
+    })  
 
 };
-function managerEmpSearch() {
 
-};
 function addEmp() {
-    // What is the employee's first name?
-    // What is the employee's last name?
-    // What is the employee's role? Choices: Sales Lead, Sales
-
 };
-function removeEmp() {
 
+function addDept(){
 };
+
 function updateEmpRole() {
-
 };
-function updateEmpManager() {
 
-};
+// function menuOrStartup() {
+//     confirm("Would you like to continue?")
+//     .then(function confirmed() {
+//       showmenu();
+//     }, function cancelled() {
+//       end();
+//     });
+//   }
+  function end() {
+    console.log("Thank you for using Employee Tracker!");
+    connection.end();
+    process.exit();
+  }
