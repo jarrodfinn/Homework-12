@@ -13,6 +13,17 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
+      connection.query("SELECT * from employee", function (error, res) {
+        // console.log(error, res);
+        showEmp = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
+      })
+      connection.query("SELECT * from department", function (error, res) {
+        showDept = res.map(dep => ({ name: dep.name, value: dep.id }))
+      })
+      connection.query("SELECT * from role", function (error, res) {
+        showRole = res.map(role => ({ name: role.title, value: role.id }))
+      })
+
     startUp();
 });
 
@@ -47,7 +58,7 @@ function startUp() {
         .then(function (answer) {
             switch (answer.action) {
                 case "View All Employees":
-                    employeeAllSearch();
+                    empAllSearch();
                     break;
                 case "View All Department":
                     deptSearch();
@@ -73,13 +84,15 @@ function startUp() {
             }
         });
 };
-function employeeAllSearch() {
+
+function empAllSearch() {
     connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (err, res) {
         if (err) throw err;
         console.table(res);
         startUp();
     });
 };
+
 function deptSearch() {
     connection.query("SELECT * from department", function (err, res) {
         if (err) throw err;
@@ -100,24 +113,85 @@ function roleSearch() {
 };
 
 function addEmp() {
+    inquirer
+    .prompt([
+      {
+        type: 'input',
+        message: "What is the first name?",
+        name: "firstName",
+      },
+      {
+        type: "input",
+        message: "What is the last name?",
+        name: "lastName",
+      },
+      {
+        type: "list",
+        message: "What is the employee's title?",
+        name: "title",
+        choices: showRole,
+      },
+      {
+        type: "list",
+        message: "Who is the employee's manager?",
+        name: "manager",
+        choices: showEmp,
+      }
+    ]).then(function (response) {
+    //   addEmp(response)
+    startUp();
+
+    })
+
+};
+
+function addEmp(data) {
+
+    connection.query("INSERT INTO employee SET ?",
+      {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        role_id: data.title,
+        manager_id: data.manager
+      }, function (error, res) {
+        if (error) throw error;
+      })
+      startUp();
 };
 
 function addDept(){
+    inquirer
+    .prompt([
+      {
+        type: 'input',
+        message: "What is the first name?",
+        name: "firstName",
+      },
+      {
+        type: "input",
+        message: "What is the last name?",
+        name: "lastName",
+      },
+      {
+        type: "list",
+        message: "What is the employee's title?",
+        name: "title",
+        choices: showRole,
+      },
+      {
+        type: "list",
+        message: "Who is the employee's manager?",
+        name: "manager",
+        choices: showEmp,
+      }
+    ]).then(function (response) {
+    //   addEmp(response)
+    startUp();
+
+    })
+
 };
 
-function updateEmpRole() {
-};
+function addRole(){
 
-// function menuOrStartup() {
-//     confirm("Would you like to continue?")
-//     .then(function confirmed() {
-//       showmenu();
-//     }, function cancelled() {
-//       end();
-//     });
-//   }
-  function end() {
-    console.log("Thank you for using Employee Tracker!");
-    connection.end();
-    process.exit();
-  }
+};
