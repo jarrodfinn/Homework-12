@@ -1,7 +1,6 @@
 // Build a command-line application that at a minimum allows the user to:
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-// const confirm = require('inquirer-confirm');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -13,30 +12,8 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-      connection.query("SELECT * from employee", function (error, res) {
-        // console.log(error, res);
-        showEmp = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
-      })
-      connection.query("SELECT * from department", function (error, res) {
-        showDept = res.map(dep => ({ name: dep.name, value: dep.id }))
-      })
-      connection.query("SELECT * from role", function (error, res) {
-        showRole = res.map(role => ({ name: role.title, value: role.id }))
-      })
-
     startUp();
 });
-
-// Add departments, roles, employees
-// View departments, roles, employees
-// Update employee roles
-
-// Bonus points if you're able to:
-// Update employee managers
-// View employees by manager
-// Delete departments, roles, and employees
-// View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
 
 function startUp() {
     inquirer
@@ -46,11 +23,11 @@ function startUp() {
             message: "What would you like to do?",
             choices: [
                 "View All Employees",
-                "View All Department",
+                "View All Departments",
                 "View All Roles",
-                "Add Employee",
+                "Add Employees",
                 "Add Department",
-                "Add Role",
+                "Add Roles",
                 "Update Employee Role",
                 "exit"
             ]
@@ -60,22 +37,22 @@ function startUp() {
                 case "View All Employees":
                     empAllSearch();
                     break;
-                case "View All Department":
+                case "View All Departments":
                     deptSearch();
                     break;
                 case "View All Roles":
                     roleSearch();
                     break;
-                case "Add Employee":
+                case "Add Employees":
                     addEmp();
                     break;
-                case "Add Department":
+                case "Add Departments":
                     addDept();
                     break;
-                case "Add Role":
+                case "Add Roles":
                     addRole();
                     break;
-                case "Update Employee Role":
+                case "Update Employee Roles":
                     updateEmpRole();
                     break;
                 case "exit":
@@ -96,102 +73,109 @@ function empAllSearch() {
 function deptSearch() {
     connection.query("SELECT * from department", function (err, res) {
         if (err) throw err;
-
-      console.table(res);
-      startUp();
-    })  
+        console.table(res);
+        startUp();
+    })
 };
 
 function roleSearch() {
     connection.query("SELECT * from role", function (err, res) {
         if (err) throw err;
-
-      console.table(res);
-      startUp();
-    })  
-
+        console.table(res);
+        startUp();
+    });
 };
 
 function addEmp() {
+    let questions = [
+        {
+            type: "input",
+            message: "What's the employee's first name?",
+            name: "first_name",
+          },
+          {
+            type: "input",
+            message: "What's the employee's last name?",
+            name: "last_name",
+          },
+          {
+            type: "input",
+            message: "What's the employee's title?",
+            name: "title",
+          },
+          {
+            type: "input",
+            message: "Who's the employee's manager?",
+            name: "manager",
+          },
+    
+    ];
     inquirer
-    .prompt([
-      {
-        type: 'input',
-        message: "What is the first name?",
-        name: "firstName",
-      },
-      {
-        type: "input",
-        message: "What is the last name?",
-        name: "lastName",
-      },
-      {
-        type: "list",
-        message: "What is the employee's title?",
-        name: "title",
-        choices: showRole,
-      },
-      {
-        type: "list",
-        message: "Who is the employee's manager?",
-        name: "manager",
-        choices: showEmp,
-      }
-    ]).then(function (response) {
-    //   addEmp(response)
-    startUp();
+    .prompt(questions)
+    .then(function (answer) {
+        connection.query("INSERT INTO employee SET ?",
+        {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: answer.title,
+            manager_id: answer.manager
+        }, function (error) {
+            if (error) throw error;
+            startUp();
+        })
+    })};
 
-    })
 
-};
-
-function addEmp(data) {
-
-    connection.query("INSERT INTO employee SET ?",
-      {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        role_id: data.title,
-        manager_id: data.manager
-      }, function (error, res) {
-        if (error) throw error;
-      })
-      startUp();
-};
-
-function addDept(){
+function addDept() {
     inquirer
-    .prompt([
-      {
-        type: 'input',
-        message: "What is the first name?",
-        name: "firstName",
-      },
-      {
-        type: "input",
-        message: "What is the last name?",
-        name: "lastName",
-      },
-      {
-        type: "list",
-        message: "What is the employee's title?",
-        name: "title",
-        choices: showRole,
-      },
-      {
-        type: "list",
-        message: "Who is the employee's manager?",
-        name: "manager",
-        choices: showEmp,
-      }
-    ]).then(function (response) {
-    //   addEmp(response)
-    startUp();
+    .prompt(
+        {
+            type: "input",
+            message: "What would you like to name the new department?",
+            name: "department"
+          }
+      ).then(function (answer) {
+        connection.query("INSERT INTO department SET ?", 
+        {
+            name: answer.department,
+        },
+        function (err, res) {
+            if (err) throw err;
+        startUp();
+    });
+  })};
 
-    })
+function addRole() {
+    let questions = [
+        {
+            type: "input",
+            message: "What type of role would you like to add?",
+            name: "title"
+        },
+        {
+            type: "input",
+            message: "In what department is the new role?",
+            name: "id",
+        },
+        {           
+            type: "list",
+            message: "What is the salary for this role?",
+            name: "salary",
+        },
 
-};
-
-function addRole(){
-
+    ];
+    inquirer
+        .prompt(questions)
+        .then(function (answer) {
+            connection.query("INSERT INTO role SET ?", 
+            {
+                title: answer.title,
+                department_id: answer.id,
+                salary: answer.salary,
+                
+              }, function (error, res) {
+                if (error) throw error;
+                startUp();
+              });
+        })
 };
