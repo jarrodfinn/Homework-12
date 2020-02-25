@@ -3,19 +3,19 @@ CREATE DATABASE employees;
 USE employees;
 
 CREATE TABLE department( 
-id INT AUTO_INCREMENT NOT NULL,
-name VARCHAR (30) NOT NULL,
-PRIMARY KEY (id)
+department_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+name VARCHAR (30) NOT NULL
 );
+
 INSERT INTO department (name)
 VALUES ("Sales"), ("Engineering"), ("Finance"), ("Legal");
 
 CREATE TABLE role (
-id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+role_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 title VARCHAR (30) NOT NULL,
 salary DECIMAL(10, 2) NOT NULL,
-department_id INT NOT NULL,
-CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE CASCADE
+department_id INT,
+CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(department_id) ON DELETE CASCADE
 );
 INSERT INTO role (title, salary, department_id)
 VALUES ("Sales Lead", 100000, 1);
@@ -35,18 +35,19 @@ INSERT INTO role (title, salary, department_id)
 VALUES ("Lawyer", 190000, 4);
 
 CREATE TABLE employee(
-id INT AUTO_INCREMENT PRIMARY KEY,
+employee_id INT AUTO_INCREMENT PRIMARY KEY,
 first_name VARCHAR (30) NOT NULL,
 last_name VARCHAR (30) NOT NULL,
-role_id INT NULL,
-manager_id INT,
-CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE SET NULL,
-CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE CASCADE
+role_id INT,
+manager_id INT NULL,
+CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE SET NULL,
+CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employee(employee_id) ON DELETE CASCADE
 );
+
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("John", "Doe", 1, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Julia", "Spieler", 2, 3);
+VALUES ("Julia", "Spieler", 2, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Jarrod", "Finn", 3, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -60,6 +61,6 @@ VALUES  ("Austin", "Bickford", 7, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES  ("Ian", "Rubin", 8, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Jane", "Rubin", 5, 4);
+VALUES ("Jane", "Rubin", 5, null);
 INSERT INTO employee  (first_name, last_name, role_id, manager_id)
 VALUES ("Amanda", "Hugankiss", 6, null);
