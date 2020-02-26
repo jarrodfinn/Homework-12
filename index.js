@@ -26,7 +26,7 @@ function startUp() {
         "View All Departments",
         "View All Roles",
         "Add Employees",
-        "Add Department",
+        "Add Departments",
         "Add Roles",
         "Update Employee Role",
         "exit"
@@ -89,6 +89,10 @@ function roleSearch() {
   });
 };
 
+function updateEmpManager (empID, roleID){
+connection.query("UPDATE employee SET role_id = ? WHERE employee_id = ?", [roleID, empID])
+};
+
 function addEmp() {
   var questions = [
     {
@@ -103,12 +107,12 @@ function addEmp() {
     },
     {
       type: "input",
-      message: "What's the employee's title?",
+      message: "What's the employee's title (role_id)?",
       name: "titleID"
     },
     {
       type: "input",
-      message: "Who's the employee's manager?",
+      message: "Who's the employee's manager (employee_id)?",
       name: "managerID"
     }
   ];
@@ -123,7 +127,8 @@ function addEmp() {
       },
       function(error) {
         if (error) throw error;
-        startUp();
+        updateEmpManager(answer.titleID, answer.managerID);
+        empAllSearch();
       }
     );
   });
@@ -183,5 +188,17 @@ function addRole() {
   });
 };
 function updateEmpRole() {
+  var employees = empAllSearch();
+  var empChoices = employees.map(index => {
+    id: id;
+  })
+  inquirer.prompt({
+   type: "list",
+   name: "role id",
+  message: " WHich role would you like to assign the employee?",
+  choices: empChoices
+
+  })
+  connection.query("UPDATE employee SET role_id = ? WHERE employee_id = ?", [roleID, empID])
 
 };
